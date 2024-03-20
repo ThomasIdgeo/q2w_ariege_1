@@ -19,7 +19,7 @@
             margin: 0;
         }
         </style>
-        <title>Une Webmap du 09 "à la Sauce QGIS"</title>
+        <title>Les forêts de Hêtre du 09 "à la Sauce QGIS"</title>
     </head>
     <body>
         <div id="map">
@@ -38,7 +38,7 @@
         <script src="js/tailDT.js"></script>
 <script src="js/nouislider.min.js"></script>
 <script src="js/wNumb.js"></script>
-        <script src="data/Foret_1.js"></script>
+        <script src="data/EssenceHtre_1.js"></script>
         <script src="data/CommuneArige_2.js"></script>
         <script>
         var highlightLayer;
@@ -103,7 +103,7 @@
             attribution: '<a href="idego.fr">idgeo, ign</a>',
         });
         map.addLayer(layer_Photographiesariennes_0);
-        function pop_Foret_1(feature, layer) {
+        function pop_EssenceHtre_1(feature, layer) {
             layer.on({
                 mouseout: function(e) {
                     for (i in e.target._eventParents) {
@@ -114,19 +114,22 @@
             });
             var popupContent = '<table>\
                     <tr>\
-                        <th scope="row">CODE_TFV</th>\
-                        <td class="visible-with-data" id="CODE_TFV">' + (feature.properties['CODE_TFV'] !== null ? autolinker.link(feature.properties['CODE_TFV'].toLocaleString()) : '') + '</td>\
+                        <td colspan="2">' + (feature.properties['id_0'] !== null ? autolinker.link(feature.properties['id_0'].toLocaleString()) : '') + '</td>\
                     </tr>\
                     <tr>\
-                        <th scope="row">TFV</th>\
-                        <td class="visible-with-data" id="TFV">' + (feature.properties['TFV'] !== null ? autolinker.link(feature.properties['TFV'].toLocaleString()) : '') + '</td>\
+                        <td colspan="2">' + (feature.properties['id'] !== null ? autolinker.link(feature.properties['id'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['CODE_TFV'] !== null ? autolinker.link(feature.properties['CODE_TFV'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['TFV'] !== null ? autolinker.link(feature.properties['TFV'].toLocaleString()) : '') + '</td>\
                     </tr>\
                     <tr>\
                         <td colspan="2">' + (feature.properties['TFV_G11'] !== null ? autolinker.link(feature.properties['TFV_G11'].toLocaleString()) : '') + '</td>\
                     </tr>\
                     <tr>\
-                        <th scope="row">ESSENCE</th>\
-                        <td class="visible-with-data" id="ESSENCE">' + (feature.properties['ESSENCE'] !== null ? autolinker.link(feature.properties['ESSENCE'].toLocaleString()) : '') + '</td>\
+                        <td colspan="2">' + (feature.properties['ESSENCE'] !== null ? autolinker.link(feature.properties['ESSENCE'].toLocaleString()) : '') + '</td>\
                     </tr>\
                 </table>';
             layer.bindPopup(popupContent, {maxHeight: 400});
@@ -136,204 +139,35 @@
             popup.setContent(updatedContent);
         }
 
-        function style_Foret_1_0(feature) {
-            switch(String(feature.properties['TFV_G11'])) {
-                case 'Forêt fermée conifères':
-                    return {
-                pane: 'pane_Foret_1',
+        function style_EssenceHtre_1_0() {
+            return {
+                pane: 'pane_EssenceHtre_1',
                 opacity: 1,
-                color: 'rgba(225,225,225,0.7333333333333333)',
+                color: 'rgba(189,98,0,1.0)',
                 dashArray: '',
                 lineCap: 'butt',
                 lineJoin: 'miter',
                 weight: 1.0, 
                 fill: true,
                 fillOpacity: 1,
-                fillColor: 'rgba(28,112,67,0.47058823529411764)',
-                interactive: false,
-            }
-                    break;
-                case 'Forêt fermée feuillus':
-                    return {
-                pane: 'pane_Foret_1',
-                opacity: 1,
-                color: 'rgba(225,225,225,0.7333333333333333)',
-                dashArray: '',
-                lineCap: 'butt',
-                lineJoin: 'miter',
-                weight: 1.0, 
-                fill: true,
-                fillOpacity: 1,
-                fillColor: 'rgba(28,172,67,0.47058823529411764)',
-                interactive: false,
-            }
-                    break;
-                case 'Forêt fermée mixte':
-                    return {
-                pane: 'pane_Foret_1',
-                opacity: 1,
-                color: 'rgba(225,225,225,0.7333333333333333)',
-                dashArray: '',
-                lineCap: 'butt',
-                lineJoin: 'miter',
-                weight: 1.0, 
-                fill: true,
-                fillOpacity: 1,
-                fillColor: 'rgba(28,112,14,0.47058823529411764)',
-                interactive: false,
-            }
-                    break;
-                case 'Forêt fermée sans couvert arboré':
-                    return {
-                pane: 'pane_Foret_1',
-                opacity: 1,
-                color: 'rgba(225,225,225,0.7333333333333333)',
-                dashArray: '',
-                lineCap: 'butt',
-                lineJoin: 'miter',
-                weight: 1.0, 
-                fill: true,
-                fillOpacity: 1,
-                fillColor: 'rgba(213,168,119,1.0)',
-                interactive: false,
-            }
-                    break;
-                case 'Forêt ouverte conifères':
-                    return {
-                pane: 'pane_Foret_1',
-                opacity: 1,
-                color: 'rgba(225,225,225,0.7333333333333333)',
-                dashArray: '',
-                lineCap: 'butt',
-                lineJoin: 'miter',
-                weight: 1.0, 
-                fill: true,
-                fillOpacity: 1,
-                fillColor: 'rgba(28,112,67,0.47058823529411764)',
-                interactive: false,
-            }
-                    break;
-                case 'Forêt ouverte feuillus':
-                    return {
-                pane: 'pane_Foret_1',
-                opacity: 1,
-                color: 'rgba(225,225,225,0.7333333333333333)',
-                dashArray: '',
-                lineCap: 'butt',
-                lineJoin: 'miter',
-                weight: 1.0, 
-                fill: true,
-                fillOpacity: 1,
-                fillColor: 'rgba(28,172,67,0.47058823529411764)',
-                interactive: false,
-            }
-                    break;
-                case 'Forêt ouverte mixte':
-                    return {
-                pane: 'pane_Foret_1',
-                opacity: 1,
-                color: 'rgba(225,225,225,0.7333333333333333)',
-                dashArray: '',
-                lineCap: 'butt',
-                lineJoin: 'miter',
-                weight: 1.0, 
-                fill: true,
-                fillOpacity: 1,
-                fillColor: 'rgba(28,112,14,0.47058823529411764)',
-                interactive: false,
-            }
-                    break;
-                case 'Forêt ouverte sans couvert arboré':
-                    return {
-                pane: 'pane_Foret_1',
-                opacity: 1,
-                color: 'rgba(225,225,225,0.7333333333333333)',
-                dashArray: '',
-                lineCap: 'butt',
-                lineJoin: 'miter',
-                weight: 1.0, 
-                fill: true,
-                fillOpacity: 1,
-                fillColor: 'rgba(213,168,119,1.0)',
-                interactive: false,
-            }
-                    break;
-                case 'Formation herbacée':
-                    return {
-                pane: 'pane_Foret_1',
-                opacity: 1,
-                color: 'rgba(225,225,225,0.7333333333333333)',
-                dashArray: '',
-                lineCap: 'butt',
-                lineJoin: 'miter',
-                weight: 1.0, 
-                fill: true,
-                fillOpacity: 1,
-                fillColor: 'rgba(129,146,75,1.0)',
-                interactive: false,
-            }
-                    break;
-                case 'Lande':
-                    return {
-                pane: 'pane_Foret_1',
-                opacity: 1,
-                color: 'rgba(225,225,225,0.7333333333333333)',
-                dashArray: '',
-                lineCap: 'butt',
-                lineJoin: 'miter',
-                weight: 1.0, 
-                fill: true,
-                fillOpacity: 1,
-                fillColor: 'rgba(64,64,222,0.32941176470588235)',
-                interactive: false,
-            }
-                    break;
-                case 'Peupleraie':
-                    return {
-                pane: 'pane_Foret_1',
-                opacity: 1,
-                color: 'rgba(225,225,225,0.7333333333333333)',
-                dashArray: '',
-                lineCap: 'butt',
-                lineJoin: 'miter',
-                weight: 1.0, 
-                fill: true,
-                fillOpacity: 1,
-                fillColor: 'rgba(83,220,151,1.0)',
-                interactive: false,
-            }
-                    break;
-                case 'NULL':
-                    return {
-                pane: 'pane_Foret_1',
-                opacity: 1,
-                color: 'rgba(225,225,225,0.7333333333333333)',
-                dashArray: '',
-                lineCap: 'butt',
-                lineJoin: 'miter',
-                weight: 1.0, 
-                fill: true,
-                fillOpacity: 1,
-                fillColor: 'rgba(213,27,27,1.0)',
-                interactive: false,
-            }
-                    break;
+                fillColor: 'rgba(229,182,54,0.45098039215686275)',
+                interactive: true,
             }
         }
-        map.createPane('pane_Foret_1');
-        map.getPane('pane_Foret_1').style.zIndex = 401;
-        map.getPane('pane_Foret_1').style['mix-blend-mode'] = 'normal';
-        var layer_Foret_1 = new L.geoJson(json_Foret_1, {
+        map.createPane('pane_EssenceHtre_1');
+        map.getPane('pane_EssenceHtre_1').style.zIndex = 401;
+        map.getPane('pane_EssenceHtre_1').style['mix-blend-mode'] = 'normal';
+        var layer_EssenceHtre_1 = new L.geoJson(json_EssenceHtre_1, {
             attribution: '',
-            interactive: false,
-            dataVar: 'json_Foret_1',
-            layerName: 'layer_Foret_1',
-            pane: 'pane_Foret_1',
-            onEachFeature: pop_Foret_1,
-            style: style_Foret_1_0,
+            interactive: true,
+            dataVar: 'json_EssenceHtre_1',
+            layerName: 'layer_EssenceHtre_1',
+            pane: 'pane_EssenceHtre_1',
+            onEachFeature: pop_EssenceHtre_1,
+            style: style_EssenceHtre_1_0,
         });
-        bounds_group.addLayer(layer_Foret_1);
-        map.addLayer(layer_Foret_1);
+        bounds_group.addLayer(layer_EssenceHtre_1);
+        map.addLayer(layer_EssenceHtre_1);
         function pop_CommuneArige_2(feature, layer) {
             layer.on({
                 mouseout: function(e) {
@@ -390,18 +224,6 @@
         });
         bounds_group.addLayer(layer_CommuneArige_2);
         map.addLayer(layer_CommuneArige_2);
-        map.on("zoomend", function(e) {
-            if (map.getZoom() <= 19 && map.getZoom() >= 10) {
-                map.addLayer(layer_Foret_1);
-            } else if (map.getZoom() > 19 || map.getZoom() < 10) {
-                map.removeLayer(layer_Foret_1);
-            }
-        });
-            if (map.getZoom() <= 19 && map.getZoom() >= 10) {
-                map.addLayer(layer_Foret_1);
-            } else if (map.getZoom() > 19 || map.getZoom() < 10) {
-                map.removeLayer(layer_Foret_1);
-            }
             var title = new L.Control();
             title.onAdd = function (map) {
                 this._div = L.DomUtil.create('div', 'info');
@@ -409,9 +231,11 @@
                 return this._div;
             };
             title.update = function () {
-                this._div.innerHTML = '<h2>Une Webmap du 09 "à la Sauce QGIS"</h2>';
+                this._div.innerHTML = '<h2>Les forêts de Hêtre du 09 "à la Sauce QGIS"</h2>';
             };
             title.addTo(map);
+        var baseMaps = {};
+        L.control.layers(baseMaps,{'<img src="legend/CommuneArige_2.png" /> Commune Ariège': layer_CommuneArige_2,'<img src="legend/EssenceHtre_1.png" /> Essence Hêtre': layer_EssenceHtre_1,"Photographies aériennes": layer_Photographiesariennes_0,}).addTo(map);
         map.on("zoomend", function(){
 
                 if (map.hasLayer(layer_CommuneArige_2)) {
@@ -455,7 +279,7 @@
             layer: layer_CommuneArige_2,
             initial: false,
             hideMarkerOnCollapse: true,
-            propertyName: 'NOM'}));
+            propertyName: 'NOM_M'}));
         document.getElementsByClassName('search-button')[0].className +=
          ' fa fa-binoculars';
         var mapDiv = document.getElementById('map');
@@ -477,7 +301,7 @@
         document.getElementById("all").appendChild(col1);
         document.getElementById("all").appendChild(col2);
         col1.appendChild(mapDiv)
-        var Filters = {"NOM": "str"};
+        var Filters = {"NOM": "str","CODE_TFV": "str"};
         function filterFunc() {
           map.eachLayer(function(lyr){
           if ("options" in lyr && "dataVar" in lyr["options"]){
@@ -936,6 +760,36 @@
                 filterFunc();
             };
             div_NOM.appendChild(reset_NOM);
+            document.getElementById("menu").appendChild(
+                document.createElement("div"));
+            var div_CODE_TFV = document.createElement('div');
+            div_CODE_TFV.id = "div_CODE_TFV";
+            div_CODE_TFV.className= "filterselect";
+            document.getElementById("menu").appendChild(div_CODE_TFV);
+            sel_CODE_TFV = document.createElement('select');
+            sel_CODE_TFV.multiple = true;
+            sel_CODE_TFV.size = 1;
+            sel_CODE_TFV.id = "sel_CODE_TFV";
+            var CODE_TFV_options_str = "<option value='' unselected></option>";
+            sel_CODE_TFV.onchange = function(){filterFunc()};
+            CODE_TFV_options_str  += '<option value="FF1-09-09">FF1-09-09</option>';
+            sel_CODE_TFV.innerHTML = CODE_TFV_options_str;
+            div_CODE_TFV.appendChild(sel_CODE_TFV);
+            var lab_CODE_TFV = document.createElement('div');
+            lab_CODE_TFV.innerHTML = 'CODE_TFV';
+            lab_CODE_TFV.className = 'filterlabel';
+            div_CODE_TFV.appendChild(lab_CODE_TFV);
+            var reset_CODE_TFV = document.createElement('div');
+            reset_CODE_TFV.innerHTML = 'clear filter';
+            reset_CODE_TFV.className = 'filterlabel';
+            reset_CODE_TFV.onclick = function() {
+                var options = document.getElementById("sel_CODE_TFV").options;
+                for (var i=0; i < options.length; i++) {
+                    options[i].selected = false;
+                }
+                filterFunc();
+            };
+            div_CODE_TFV.appendChild(reset_CODE_TFV);
         resetLabels([layer_CommuneArige_2]);
         map.on("zoomend", function(){
             resetLabels([layer_CommuneArige_2]);

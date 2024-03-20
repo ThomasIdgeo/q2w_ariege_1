@@ -1,0 +1,951 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="initial-scale=1,user-scalable=no,maximum-scale=1,width=device-width">
+        <meta name="mobile-web-app-capable" content="yes">
+        <meta name="apple-mobile-web-app-capable" content="yes">
+        <link rel="stylesheet" href="css/leaflet.css">
+        <link rel="stylesheet" href="css/qgis2web.css"><link rel="stylesheet" href="css/fontawesome-all.min.css">
+        <link rel="stylesheet" href="css/leaflet-search.css">
+        <link rel="stylesheet" href="css/filter.css">
+<link rel="stylesheet" href="css/nouislider.min.css">
+        <style>
+        html, body, #map {
+            width: 100%;
+            height: 100%;
+            padding: 0;
+            margin: 0;
+        }
+        </style>
+        <title>Une Webmap du 09 "à la Sauce QGIS"</title>
+    </head>
+    <body>
+        <div id="map">
+        </div>
+        <script src="js/qgis2web_expressions.js"></script>
+        <script src="js/leaflet.js"></script>
+        <script src="js/leaflet.rotatedMarker.js"></script>
+        <script src="js/leaflet.pattern.js"></script>
+        <script src="js/leaflet-hash.js"></script>
+        <script src="js/Autolinker.min.js"></script>
+        <script src="js/rbush.min.js"></script>
+        <script src="js/labelgun.min.js"></script>
+        <script src="js/labels.js"></script>
+        <script src="js/leaflet-tilelayer-wmts.js"></script>
+        <script src="js/leaflet-search.js"></script>
+        <script src="js/tailDT.js"></script>
+<script src="js/nouislider.min.js"></script>
+<script src="js/wNumb.js"></script>
+        <script src="data/Foret_1.js"></script>
+        <script src="data/CommuneArige_2.js"></script>
+        <script>
+        var highlightLayer;
+        function highlightFeature(e) {
+            highlightLayer = e.target;
+
+            if (e.target.feature.geometry.type === 'LineString') {
+              highlightLayer.setStyle({
+                color: '#dfdfd5',
+              });
+            } else {
+              highlightLayer.setStyle({
+                fillColor: '#dfdfd5',
+                fillOpacity: 1
+              });
+            }
+        }
+        var map = L.map('map', {
+            zoomControl:true, maxZoom:20, minZoom:1
+        }).fitBounds([[42.537050620252195,0.6680240555000967],[43.34474364970331,2.3205454397251026]]);
+        var hash = new L.Hash(map);
+        map.attributionControl.setPrefix('<a href="https://github.com/tomchadwin/qgis2web" target="_blank">qgis2web</a> &middot; <a href="https://leafletjs.com" title="A JS library for interactive maps">Leaflet</a> &middot; <a href="https://qgis.org">QGIS</a>');
+        var autolinker = new Autolinker({truncate: {length: 30, location: 'smart'}});
+        function removeEmptyRowsFromPopupContent(content, feature) {
+         var tempDiv = document.createElement('div');
+         tempDiv.innerHTML = content;
+         var rows = tempDiv.querySelectorAll('tr');
+         for (var i = 0; i < rows.length; i++) {
+             var td = rows[i].querySelector('td.visible-with-data');
+             var key = td ? td.id : '';
+             if (td && td.classList.contains('visible-with-data') && feature.properties[key] == null) {
+                 rows[i].parentNode.removeChild(rows[i]);
+             }
+         }
+         return tempDiv.innerHTML;
+        }
+        document.querySelector(".leaflet-popup-pane").addEventListener("load", function(event) {
+          var tagName = event.target.tagName,
+            popup = map._popup;
+          // Also check if flag is already set.
+          if (tagName === "IMG" && popup && !popup._updated) {
+            popup._updated = true; // Set flag to prevent looping.
+            popup.update();
+          }
+        }, true);
+        var bounds_group = new L.featureGroup([]);
+        function setBounds() {
+            map.setMaxBounds(map.getBounds());
+        }
+        map.createPane('pane_Photographiesariennes_0');
+        map.getPane('pane_Photographiesariennes_0').style.zIndex = 400;
+        var layer_Photographiesariennes_0 = L.tileLayer.wmts('https://data.geopf.fr/wmts', {
+            pane: 'pane_Photographiesariennes_0',
+            layer: 'ORTHOIMAGERY.ORTHOPHOTOS',
+            tilematrixSet: 'PM',
+            format: 'image/jpeg',
+            style: 'normal',
+            uppercase: true,
+            transparent: true,
+            continuousWorld : true,
+            opacity: 1.0,
+            attribution: '<a href="idego.fr">idgeo, ign</a>',
+        });
+        map.addLayer(layer_Photographiesariennes_0);
+        function pop_Foret_1(feature, layer) {
+            layer.on({
+                mouseout: function(e) {
+                    for (i in e.target._eventParents) {
+                        e.target._eventParents[i].resetStyle(e.target);
+                    }
+                },
+                mouseover: highlightFeature,
+            });
+            var popupContent = '<table>\
+                    <tr>\
+                        <th scope="row">CODE_TFV</th>\
+                        <td class="visible-with-data" id="CODE_TFV">' + (feature.properties['CODE_TFV'] !== null ? autolinker.link(feature.properties['CODE_TFV'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">TFV</th>\
+                        <td class="visible-with-data" id="TFV">' + (feature.properties['TFV'] !== null ? autolinker.link(feature.properties['TFV'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['TFV_G11'] !== null ? autolinker.link(feature.properties['TFV_G11'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">ESSENCE</th>\
+                        <td class="visible-with-data" id="ESSENCE">' + (feature.properties['ESSENCE'] !== null ? autolinker.link(feature.properties['ESSENCE'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                </table>';
+            layer.bindPopup(popupContent, {maxHeight: 400});
+            var popup = layer.getPopup();
+            var content = popup.getContent();
+            var updatedContent = removeEmptyRowsFromPopupContent(content, feature);
+            popup.setContent(updatedContent);
+        }
+
+        function style_Foret_1_0(feature) {
+            switch(String(feature.properties['TFV_G11'])) {
+                case 'Forêt fermée conifères':
+                    return {
+                pane: 'pane_Foret_1',
+                opacity: 1,
+                color: 'rgba(225,225,225,0.7333333333333333)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(28,112,67,0.47058823529411764)',
+                interactive: false,
+            }
+                    break;
+                case 'Forêt fermée feuillus':
+                    return {
+                pane: 'pane_Foret_1',
+                opacity: 1,
+                color: 'rgba(225,225,225,0.7333333333333333)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(28,172,67,0.47058823529411764)',
+                interactive: false,
+            }
+                    break;
+                case 'Forêt fermée mixte':
+                    return {
+                pane: 'pane_Foret_1',
+                opacity: 1,
+                color: 'rgba(225,225,225,0.7333333333333333)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(28,112,14,0.47058823529411764)',
+                interactive: false,
+            }
+                    break;
+                case 'Forêt fermée sans couvert arboré':
+                    return {
+                pane: 'pane_Foret_1',
+                opacity: 1,
+                color: 'rgba(225,225,225,0.7333333333333333)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(213,168,119,1.0)',
+                interactive: false,
+            }
+                    break;
+                case 'Forêt ouverte conifères':
+                    return {
+                pane: 'pane_Foret_1',
+                opacity: 1,
+                color: 'rgba(225,225,225,0.7333333333333333)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(28,112,67,0.47058823529411764)',
+                interactive: false,
+            }
+                    break;
+                case 'Forêt ouverte feuillus':
+                    return {
+                pane: 'pane_Foret_1',
+                opacity: 1,
+                color: 'rgba(225,225,225,0.7333333333333333)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(28,172,67,0.47058823529411764)',
+                interactive: false,
+            }
+                    break;
+                case 'Forêt ouverte mixte':
+                    return {
+                pane: 'pane_Foret_1',
+                opacity: 1,
+                color: 'rgba(225,225,225,0.7333333333333333)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(28,112,14,0.47058823529411764)',
+                interactive: false,
+            }
+                    break;
+                case 'Forêt ouverte sans couvert arboré':
+                    return {
+                pane: 'pane_Foret_1',
+                opacity: 1,
+                color: 'rgba(225,225,225,0.7333333333333333)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(213,168,119,1.0)',
+                interactive: false,
+            }
+                    break;
+                case 'Formation herbacée':
+                    return {
+                pane: 'pane_Foret_1',
+                opacity: 1,
+                color: 'rgba(225,225,225,0.7333333333333333)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(129,146,75,1.0)',
+                interactive: false,
+            }
+                    break;
+                case 'Lande':
+                    return {
+                pane: 'pane_Foret_1',
+                opacity: 1,
+                color: 'rgba(225,225,225,0.7333333333333333)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(64,64,222,0.32941176470588235)',
+                interactive: false,
+            }
+                    break;
+                case 'Peupleraie':
+                    return {
+                pane: 'pane_Foret_1',
+                opacity: 1,
+                color: 'rgba(225,225,225,0.7333333333333333)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(83,220,151,1.0)',
+                interactive: false,
+            }
+                    break;
+                case 'NULL':
+                    return {
+                pane: 'pane_Foret_1',
+                opacity: 1,
+                color: 'rgba(225,225,225,0.7333333333333333)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(213,27,27,1.0)',
+                interactive: false,
+            }
+                    break;
+            }
+        }
+        map.createPane('pane_Foret_1');
+        map.getPane('pane_Foret_1').style.zIndex = 401;
+        map.getPane('pane_Foret_1').style['mix-blend-mode'] = 'normal';
+        var layer_Foret_1 = new L.geoJson(json_Foret_1, {
+            attribution: '',
+            interactive: false,
+            dataVar: 'json_Foret_1',
+            layerName: 'layer_Foret_1',
+            pane: 'pane_Foret_1',
+            onEachFeature: pop_Foret_1,
+            style: style_Foret_1_0,
+        });
+        bounds_group.addLayer(layer_Foret_1);
+        map.addLayer(layer_Foret_1);
+        function pop_CommuneArige_2(feature, layer) {
+            layer.on({
+                mouseout: function(e) {
+                    for (i in e.target._eventParents) {
+                        e.target._eventParents[i].resetStyle(e.target);
+                    }
+                },
+                mouseover: highlightFeature,
+            });
+            var popupContent = '<table>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['NOM'] !== null ? autolinker.link(feature.properties['NOM'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">INSEE_COM</th>\
+                        <td class="visible-with-data" id="INSEE_COM">' + (feature.properties['INSEE_COM'] !== null ? autolinker.link(feature.properties['INSEE_COM'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">POPULATION</th>\
+                        <td class="visible-with-data" id="POPULATION">' + (feature.properties['POPULATION'] !== null ? autolinker.link(feature.properties['POPULATION'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                </table>';
+            layer.bindPopup(popupContent, {maxHeight: 400});
+            var popup = layer.getPopup();
+            var content = popup.getContent();
+            var updatedContent = removeEmptyRowsFromPopupContent(content, feature);
+            popup.setContent(updatedContent);
+        }
+
+        function style_CommuneArige_2_0() {
+            return {
+                pane: 'pane_CommuneArige_2',
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fillOpacity: 0,
+                interactive: true,
+            }
+        }
+        map.createPane('pane_CommuneArige_2');
+        map.getPane('pane_CommuneArige_2').style.zIndex = 402;
+        map.getPane('pane_CommuneArige_2').style['mix-blend-mode'] = 'normal';
+        var layer_CommuneArige_2 = new L.geoJson(json_CommuneArige_2, {
+            attribution: '',
+            interactive: true,
+            dataVar: 'json_CommuneArige_2',
+            layerName: 'layer_CommuneArige_2',
+            pane: 'pane_CommuneArige_2',
+            onEachFeature: pop_CommuneArige_2,
+            style: style_CommuneArige_2_0,
+        });
+        bounds_group.addLayer(layer_CommuneArige_2);
+        map.addLayer(layer_CommuneArige_2);
+        map.on("zoomend", function(e) {
+            if (map.getZoom() <= 19 && map.getZoom() >= 10) {
+                map.addLayer(layer_Foret_1);
+            } else if (map.getZoom() > 19 || map.getZoom() < 10) {
+                map.removeLayer(layer_Foret_1);
+            }
+        });
+            if (map.getZoom() <= 19 && map.getZoom() >= 10) {
+                map.addLayer(layer_Foret_1);
+            } else if (map.getZoom() > 19 || map.getZoom() < 10) {
+                map.removeLayer(layer_Foret_1);
+            }
+            var title = new L.Control();
+            title.onAdd = function (map) {
+                this._div = L.DomUtil.create('div', 'info');
+                this.update();
+                return this._div;
+            };
+            title.update = function () {
+                this._div.innerHTML = '<h2>Une Webmap du 09 "à la Sauce QGIS"</h2>';
+            };
+            title.addTo(map);
+        map.on("zoomend", function(){
+
+                if (map.hasLayer(layer_CommuneArige_2)) {
+                    if (map.getZoom() <= 12 && map.getZoom() >= 19) {
+                        layer_CommuneArige_2.eachLayer(function (layer) {
+                            layer.openTooltip();
+                        });
+                    } else {
+                        layer_CommuneArige_2.eachLayer(function (layer) {
+                            layer.closeTooltip();
+                        });
+                    }
+                }
+        });
+        setBounds();
+        var i = 0;
+        layer_CommuneArige_2.eachLayer(function(layer) {
+            var context = {
+                feature: layer.feature,
+                variables: {}
+            };
+            layer.bindTooltip((layer.feature.properties['NOM'] !== null?String('<div style="color: #fbfbfb; font-size: 8pt; font-family: \'Open Sans\', sans-serif;">' + layer.feature.properties['NOM']) + '</div>':''), {permanent: true, offset: [-0, -16], className: 'css_CommuneArige_2'});
+            labels.push(layer);
+            totalMarkers += 1;
+              layer.added = true;
+              addLabel(layer, i);
+              i++;
+        });
+                if (map.hasLayer(layer_CommuneArige_2)) {
+                    if (map.getZoom() <= 12 && map.getZoom() >= 19) {
+                        layer_CommuneArige_2.eachLayer(function (layer) {
+                            layer.openTooltip();
+                        });
+                    } else {
+                        layer_CommuneArige_2.eachLayer(function (layer) {
+                            layer.closeTooltip();
+                        });
+                    }
+                }
+        map.addControl(new L.Control.Search({
+            layer: layer_CommuneArige_2,
+            initial: false,
+            hideMarkerOnCollapse: true,
+            propertyName: 'NOM'}));
+        document.getElementsByClassName('search-button')[0].className +=
+         ' fa fa-binoculars';
+        var mapDiv = document.getElementById('map');
+        var row = document.createElement('div');
+        row.className="row";
+        row.id="all";
+        row.style.height = "100%";
+        var col1 = document.createElement('div');
+        col1.className="col9";
+        col1.id = "mapWindow";
+        col1.style.height = "99%";
+        col1.style.width = "80%";
+        col1.style.display = "inline-block";
+        var col2 = document.createElement('div');
+        col2.className="col3";
+        col2.id = "menu";
+        col2.style.display = "inline-block";
+        mapDiv.parentNode.insertBefore(row, mapDiv);
+        document.getElementById("all").appendChild(col1);
+        document.getElementById("all").appendChild(col2);
+        col1.appendChild(mapDiv)
+        var Filters = {"NOM": "str"};
+        function filterFunc() {
+          map.eachLayer(function(lyr){
+          if ("options" in lyr && "dataVar" in lyr["options"]){
+            features = this[lyr["options"]["dataVar"]].features.slice(0);
+            try{
+              for (key in Filters){
+                keyS = key.replace(/[^a-zA-Z0-9_]/g, "")
+                if (Filters[key] == "str" || Filters[key] == "bool"){
+                  var selection = [];
+                  var options = document.getElementById("sel_" + keyS).options
+                  for (var i=0; i < options.length; i++) {
+                    if (options[i].selected) selection.push(options[i].value);
+                  }
+                    try{
+                      if (key in features[0].properties){
+                        for (i = features.length - 1;
+                          i >= 0; --i){
+                          if (selection.indexOf(
+                          features[i].properties[key])<0
+                          && selection.length>0) {
+                          features.splice(i,1);
+                          }
+                        }
+                      }
+                    } catch(err){
+                  }
+                }
+                if (Filters[key] == "int"){
+                  sliderVals =  document.getElementById(
+                    "div_" + keyS).noUiSlider.get();
+                  try{
+                    if (key in features[0].properties){
+                    for (i = features.length - 1; i >= 0; --i){
+                      if (parseInt(features[i].properties[key])
+                          < sliderVals[0]
+                          || parseInt(features[i].properties[key])
+                          > sliderVals[1]){
+                            features.splice(i,1);
+                          }
+                        }
+                      }
+                    } catch(err){
+                    }
+                  }
+                if (Filters[key] == "real"){
+                  sliderVals =  document.getElementById(
+                    "div_" + keyS).noUiSlider.get();
+                  try{
+                    if (key in features[0].properties){
+                    for (i = features.length - 1; i >= 0; --i){
+                      if (features[i].properties[key]
+                          < sliderVals[0]
+                          || features[i].properties[key]
+                          > sliderVals[1]){
+                            features.splice(i,1);
+                          }
+                        }
+                      }
+                    } catch(err){
+                    }
+                  }
+                if (Filters[key] == "date"
+                  || Filters[key] == "datetime"
+                  || Filters[key] == "time"){
+                  try{
+                    if (key in features[0].properties){
+                      HTMLkey = key.replace(/[&\/\\#,+()$~%.'":*?<>{} ]/g, '');
+                      startdate = document.getElementById("dat_" +
+                        HTMLkey + "_date1").value.replace(" ", "T");
+                      enddate = document.getElementById("dat_" +
+                        HTMLkey + "_date2").value.replace(" ", "T");
+                      for (i = features.length - 1; i >= 0; --i){
+                        if (features[i].properties[key] < startdate
+                          || features[i].properties[key] > enddate){
+                          features.splice(i,1);
+                        }
+                      }
+                    }
+                  } catch(err){
+                  }
+                }
+              }
+            } catch(err){
+            }
+          this[lyr["options"]["layerName"]].clearLayers();
+          this[lyr["options"]["layerName"]].addData(features);
+        var i = 0;
+        layer_CommuneArige_2.eachLayer(function(layer) {
+            var context = {
+                feature: layer.feature,
+                variables: {}
+            };
+            layer.bindTooltip((layer.feature.properties['NOM'] !== null?String('<div style="color: #fbfbfb; font-size: 8pt; font-family: \'Open Sans\', sans-serif;">' + layer.feature.properties['NOM']) + '</div>':''), {permanent: true, offset: [-0, -16], className: 'css_CommuneArige_2'});
+            labels.push(layer);
+            totalMarkers += 1;
+              layer.added = true;
+              addLabel(layer, i);
+              i++;
+        });
+          }
+          })
+        }
+            document.getElementById("menu").appendChild(
+                document.createElement("div"));
+            var div_NOM = document.createElement('div');
+            div_NOM.id = "div_NOM";
+            div_NOM.className= "filterselect";
+            document.getElementById("menu").appendChild(div_NOM);
+            sel_NOM = document.createElement('select');
+            sel_NOM.multiple = true;
+            sel_NOM.size = 10;
+            sel_NOM.id = "sel_NOM";
+            var NOM_options_str = "<option value='' unselected></option>";
+            sel_NOM.onchange = function(){filterFunc()};
+            NOM_options_str  += '<option value="Aigues-Juntes">Aigues-Juntes</option>';
+            NOM_options_str  += '<option value="Aigues-Vives">Aigues-Vives</option>';
+            NOM_options_str  += '<option value="Albiès">Albiès</option>';
+            NOM_options_str  += '<option value="Aleu">Aleu</option>';
+            NOM_options_str  += '<option value="Alliat">Alliat</option>';
+            NOM_options_str  += '<option value="Allières">Allières</option>';
+            NOM_options_str  += '<option value="Alos">Alos</option>';
+            NOM_options_str  += '<option value="Alzen">Alzen</option>';
+            NOM_options_str  += '<option value="Antras">Antras</option>';
+            NOM_options_str  += '<option value="Appy">Appy</option>';
+            NOM_options_str  += '<option value="Arabaux">Arabaux</option>';
+            NOM_options_str  += '<option value="Argein">Argein</option>';
+            NOM_options_str  += '<option value="Arignac">Arignac</option>';
+            NOM_options_str  += '<option value="Arnave">Arnave</option>';
+            NOM_options_str  += '<option value="Arrien-en-Bethmale">Arrien-en-Bethmale</option>';
+            NOM_options_str  += '<option value="Arrout">Arrout</option>';
+            NOM_options_str  += '<option value="Artigat">Artigat</option>';
+            NOM_options_str  += '<option value="Artigues">Artigues</option>';
+            NOM_options_str  += '<option value="Artix">Artix</option>';
+            NOM_options_str  += '<option value="Arvigna">Arvigna</option>';
+            NOM_options_str  += '<option value="Ascou">Ascou</option>';
+            NOM_options_str  += '<option value="Aston">Aston</option>';
+            NOM_options_str  += '<option value="Aucazein">Aucazein</option>';
+            NOM_options_str  += '<option value="Audressein">Audressein</option>';
+            NOM_options_str  += '<option value="Augirein">Augirein</option>';
+            NOM_options_str  += '<option value="Aulos-Sinsat">Aulos-Sinsat</option>';
+            NOM_options_str  += '<option value="Aulus-les-Bains">Aulus-les-Bains</option>';
+            NOM_options_str  += '<option value="Auzat">Auzat</option>';
+            NOM_options_str  += '<option value="Ax-les-Thermes">Ax-les-Thermes</option>';
+            NOM_options_str  += '<option value="Axiat">Axiat</option>';
+            NOM_options_str  += '<option value="Bagert">Bagert</option>';
+            NOM_options_str  += '<option value="Balacet">Balacet</option>';
+            NOM_options_str  += '<option value="Balaguères">Balaguères</option>';
+            NOM_options_str  += '<option value="Barjac">Barjac</option>';
+            NOM_options_str  += '<option value="Baulou">Baulou</option>';
+            NOM_options_str  += '<option value="Belloc">Belloc</option>';
+            NOM_options_str  += '<option value="Benagues">Benagues</option>';
+            NOM_options_str  += '<option value="Besset">Besset</option>';
+            NOM_options_str  += '<option value="Bestiac">Bestiac</option>';
+            NOM_options_str  += '<option value="Betchat">Betchat</option>';
+            NOM_options_str  += '<option value="Bethmale">Bethmale</option>';
+            NOM_options_str  += '<option value="Biert">Biert</option>';
+            NOM_options_str  += '<option value="Bompas">Bompas</option>';
+            NOM_options_str  += '<option value="Bonac-Irazein">Bonac-Irazein</option>';
+            NOM_options_str  += '<option value="Bonnac">Bonnac</option>';
+            NOM_options_str  += '<option value="Bordes-Uchentein">Bordes-Uchentein</option>';
+            NOM_options_str  += '<option value="Bouan">Bouan</option>';
+            NOM_options_str  += '<option value="Boussenac">Boussenac</option>';
+            NOM_options_str  += '<option value="Brassac">Brassac</option>';
+            NOM_options_str  += '<option value="Brie">Brie</option>';
+            NOM_options_str  += '<option value="Burret">Burret</option>';
+            NOM_options_str  += '<option value="Buzan">Buzan</option>';
+            NOM_options_str  += '<option value="Bédeilhac-et-Aynat">Bédeilhac-et-Aynat</option>';
+            NOM_options_str  += '<option value="Bédeille">Bédeille</option>';
+            NOM_options_str  += '<option value="Bélesta">Bélesta</option>';
+            NOM_options_str  += '<option value="Bénac">Bénac</option>';
+            NOM_options_str  += '<option value="Bénaix">Bénaix</option>';
+            NOM_options_str  += '<option value="Bézac">Bézac</option>';
+            NOM_options_str  += '<option value="Cadarcet">Cadarcet</option>';
+            NOM_options_str  += '<option value="Calzan">Calzan</option>';
+            NOM_options_str  += '<option value="Camarade">Camarade</option>';
+            NOM_options_str  += '<option value="Camon">Camon</option>';
+            NOM_options_str  += '<option value="Campagne-sur-Arize">Campagne-sur-Arize</option>';
+            NOM_options_str  += '<option value="Canté">Canté</option>';
+            NOM_options_str  += '<option value="Capoulet-et-Junac">Capoulet-et-Junac</option>';
+            NOM_options_str  += '<option value="Carcanières">Carcanières</option>';
+            NOM_options_str  += '<option value="Carla-Bayle">Carla-Bayle</option>';
+            NOM_options_str  += '<option value="Carla-de-Roquefort">Carla-de-Roquefort</option>';
+            NOM_options_str  += '<option value="Castelnau-Durban">Castelnau-Durban</option>';
+            NOM_options_str  += '<option value="Castex">Castex</option>';
+            NOM_options_str  += '<option value="Castillon-en-Couserans">Castillon-en-Couserans</option>';
+            NOM_options_str  += '<option value="Castéras">Castéras</option>';
+            NOM_options_str  += '<option value="Caumont">Caumont</option>';
+            NOM_options_str  += '<option value="Caussou">Caussou</option>';
+            NOM_options_str  += '<option value="Caychax">Caychax</option>';
+            NOM_options_str  += '<option value="Cazals-des-Baylès">Cazals-des-Baylès</option>';
+            NOM_options_str  += '<option value="Cazaux">Cazaux</option>';
+            NOM_options_str  += '<option value="Cazavet">Cazavet</option>';
+            NOM_options_str  += '<option value="Cazenave-Serres-et-Allens">Cazenave-Serres-et-Allens</option>';
+            NOM_options_str  += '<option value="Celles">Celles</option>';
+            NOM_options_str  += '<option value="Cescau">Cescau</option>';
+            NOM_options_str  += '<option value="Château-Verdun">Château-Verdun</option>';
+            NOM_options_str  += '<option value="Clermont">Clermont</option>';
+            NOM_options_str  += '<option value="Contrazy">Contrazy</option>';
+            NOM_options_str  += '<option value="Cos">Cos</option>';
+            NOM_options_str  += '<option value="Couflens">Couflens</option>';
+            NOM_options_str  += '<option value="Coussa">Coussa</option>';
+            NOM_options_str  += '<option value="Coutens">Coutens</option>';
+            NOM_options_str  += '<option value="Crampagna">Crampagna</option>';
+            NOM_options_str  += '<option value="Cérizols">Cérizols</option>';
+            NOM_options_str  += '<option value="Dalou">Dalou</option>';
+            NOM_options_str  += '<option value="Daumazan-sur-Arize">Daumazan-sur-Arize</option>';
+            NOM_options_str  += '<option value="Dreuilhe">Dreuilhe</option>';
+            NOM_options_str  += '<option value="Dun">Dun</option>';
+            NOM_options_str  += '<option value="Durban-sur-Arize">Durban-sur-Arize</option>';
+            NOM_options_str  += '<option value="Durfort">Durfort</option>';
+            NOM_options_str  += '<option value="Encourtiech">Encourtiech</option>';
+            NOM_options_str  += '<option value="Engomer">Engomer</option>';
+            NOM_options_str  += '<option value="Ercé">Ercé</option>';
+            NOM_options_str  += '<option value="Erp">Erp</option>';
+            NOM_options_str  += '<option value="Esclagne">Esclagne</option>';
+            NOM_options_str  += '<option value="Escosse">Escosse</option>';
+            NOM_options_str  += '<option value="Esplas">Esplas</option>';
+            NOM_options_str  += '<option value="Esplas-de-Sérou">Esplas-de-Sérou</option>';
+            NOM_options_str  += '<option value="Eycheil">Eycheil</option>';
+            NOM_options_str  += '<option value="Fabas">Fabas</option>';
+            NOM_options_str  += '<option value="Ferrières-sur-Ariège">Ferrières-sur-Ariège</option>';
+            NOM_options_str  += '<option value="Foix">Foix</option>';
+            NOM_options_str  += '<option value="Fornex">Fornex</option>';
+            NOM_options_str  += '<option value="Fougax-et-Barrineuf">Fougax-et-Barrineuf</option>';
+            NOM_options_str  += '<option value="Freychenet">Freychenet</option>';
+            NOM_options_str  += '<option value="Gabre">Gabre</option>';
+            NOM_options_str  += '<option value="Gajan">Gajan</option>';
+            NOM_options_str  += '<option value="Galey">Galey</option>';
+            NOM_options_str  += '<option value="Ganac">Ganac</option>';
+            NOM_options_str  += '<option value="Garanou">Garanou</option>';
+            NOM_options_str  += '<option value="Gaudiès">Gaudiès</option>';
+            NOM_options_str  += '<option value="Gestiès">Gestiès</option>';
+            NOM_options_str  += '<option value="Gourbit">Gourbit</option>';
+            NOM_options_str  += '<option value="Gudas">Gudas</option>';
+            NOM_options_str  += '<option value="Génat">Génat</option>';
+            NOM_options_str  += '<option value="Ignaux">Ignaux</option>';
+            NOM_options_str  += '<option value="Ilhat">Ilhat</option>';
+            NOM_options_str  += '<option value="Illartein">Illartein</option>';
+            NOM_options_str  += '<option value="Illier-et-Laramade">Illier-et-Laramade</option>';
+            NOM_options_str  += '<option value="Justiniac">Justiniac</option>';
+            NOM_options_str  += '<option value="L&apos;Aiguillon">L&apos;Aiguillon</option>';
+            NOM_options_str  += '<option value="L&apos;Herm">L&apos;Herm</option>';
+            NOM_options_str  += '<option value="L&apos;Hospitalet-près-l&apos;Andorre">L&apos;Hospitalet-près-l&apos;Andorre</option>';
+            NOM_options_str  += '<option value="La Bastide-de-Besplas">La Bastide-de-Besplas</option>';
+            NOM_options_str  += '<option value="La Bastide-de-Bousignac">La Bastide-de-Bousignac</option>';
+            NOM_options_str  += '<option value="La Bastide-de-Lordat">La Bastide-de-Lordat</option>';
+            NOM_options_str  += '<option value="La Bastide-de-Sérou">La Bastide-de-Sérou</option>';
+            NOM_options_str  += '<option value="La Bastide-du-Salat">La Bastide-du-Salat</option>';
+            NOM_options_str  += '<option value="La Bastide-sur-l&apos;Hers">La Bastide-sur-l&apos;Hers</option>';
+            NOM_options_str  += '<option value="La Tour-du-Crieu">La Tour-du-Crieu</option>';
+            NOM_options_str  += '<option value="Labatut">Labatut</option>';
+            NOM_options_str  += '<option value="Lacave">Lacave</option>';
+            NOM_options_str  += '<option value="Lacourt">Lacourt</option>';
+            NOM_options_str  += '<option value="Lagarde">Lagarde</option>';
+            NOM_options_str  += '<option value="Lanoux">Lanoux</option>';
+            NOM_options_str  += '<option value="Lapenne">Lapenne</option>';
+            NOM_options_str  += '<option value="Lapège">Lapège</option>';
+            NOM_options_str  += '<option value="Larbont">Larbont</option>';
+            NOM_options_str  += '<option value="Larcat">Larcat</option>';
+            NOM_options_str  += '<option value="Larnat">Larnat</option>';
+            NOM_options_str  += '<option value="Laroque-d&apos;Olmes">Laroque-d&apos;Olmes</option>';
+            NOM_options_str  += '<option value="Lasserre">Lasserre</option>';
+            NOM_options_str  += '<option value="Lassur">Lassur</option>';
+            NOM_options_str  += '<option value="Lavelanet">Lavelanet</option>';
+            NOM_options_str  += '<option value="Le Bosc">Le Bosc</option>';
+            NOM_options_str  += '<option value="Le Carlaret">Le Carlaret</option>';
+            NOM_options_str  += '<option value="Le Fossat">Le Fossat</option>';
+            NOM_options_str  += '<option value="Le Mas-d&apos;Azil">Le Mas-d&apos;Azil</option>';
+            NOM_options_str  += '<option value="Le Peyrat">Le Peyrat</option>';
+            NOM_options_str  += '<option value="Le Pla">Le Pla</option>';
+            NOM_options_str  += '<option value="Le Port">Le Port</option>';
+            NOM_options_str  += '<option value="Le Puch">Le Puch</option>';
+            NOM_options_str  += '<option value="Le Vernet">Le Vernet</option>';
+            NOM_options_str  += '<option value="Lercoul">Lercoul</option>';
+            NOM_options_str  += '<option value="Les Bordes-sur-Arize">Les Bordes-sur-Arize</option>';
+            NOM_options_str  += '<option value="Les Cabannes">Les Cabannes</option>';
+            NOM_options_str  += '<option value="Les Issards">Les Issards</option>';
+            NOM_options_str  += '<option value="Les Pujols">Les Pujols</option>';
+            NOM_options_str  += '<option value="Lescousse">Lescousse</option>';
+            NOM_options_str  += '<option value="Lescure">Lescure</option>';
+            NOM_options_str  += '<option value="Lesparrou">Lesparrou</option>';
+            NOM_options_str  += '<option value="Leychert">Leychert</option>';
+            NOM_options_str  += '<option value="Lieurac">Lieurac</option>';
+            NOM_options_str  += '<option value="Limbrassac">Limbrassac</option>';
+            NOM_options_str  += '<option value="Lissac">Lissac</option>';
+            NOM_options_str  += '<option value="Lordat">Lordat</option>';
+            NOM_options_str  += '<option value="Lorp-Sentaraille">Lorp-Sentaraille</option>';
+            NOM_options_str  += '<option value="Loubaut">Loubaut</option>';
+            NOM_options_str  += '<option value="Loubens">Loubens</option>';
+            NOM_options_str  += '<option value="Loubières">Loubières</option>';
+            NOM_options_str  += '<option value="Ludiès">Ludiès</option>';
+            NOM_options_str  += '<option value="Luzenac">Luzenac</option>';
+            NOM_options_str  += '<option value="Léran">Léran</option>';
+            NOM_options_str  += '<option value="Lézat-sur-Lèze">Lézat-sur-Lèze</option>';
+            NOM_options_str  += '<option value="Madière">Madière</option>';
+            NOM_options_str  += '<option value="Malegoude">Malegoude</option>';
+            NOM_options_str  += '<option value="Malléon">Malléon</option>';
+            NOM_options_str  += '<option value="Manses">Manses</option>';
+            NOM_options_str  += '<option value="Massat">Massat</option>';
+            NOM_options_str  += '<option value="Mauvezin-de-Prat">Mauvezin-de-Prat</option>';
+            NOM_options_str  += '<option value="Mauvezin-de-Sainte-Croix">Mauvezin-de-Sainte-Croix</option>';
+            NOM_options_str  += '<option value="Mazères">Mazères</option>';
+            NOM_options_str  += '<option value="Mercenac">Mercenac</option>';
+            NOM_options_str  += '<option value="Mercus-Garrabet">Mercus-Garrabet</option>';
+            NOM_options_str  += '<option value="Miglos">Miglos</option>';
+            NOM_options_str  += '<option value="Mijanès">Mijanès</option>';
+            NOM_options_str  += '<option value="Mirepoix">Mirepoix</option>';
+            NOM_options_str  += '<option value="Monesple">Monesple</option>';
+            NOM_options_str  += '<option value="Montagagne">Montagagne</option>';
+            NOM_options_str  += '<option value="Montaillou">Montaillou</option>';
+            NOM_options_str  += '<option value="Montardit">Montardit</option>';
+            NOM_options_str  += '<option value="Montaut">Montaut</option>';
+            NOM_options_str  += '<option value="Montbel">Montbel</option>';
+            NOM_options_str  += '<option value="Montels">Montels</option>';
+            NOM_options_str  += '<option value="Montesquieu-Avantès">Montesquieu-Avantès</option>';
+            NOM_options_str  += '<option value="Montfa">Montfa</option>';
+            NOM_options_str  += '<option value="Montferrier">Montferrier</option>';
+            NOM_options_str  += '<option value="Montgailhard">Montgailhard</option>';
+            NOM_options_str  += '<option value="Montgauch">Montgauch</option>';
+            NOM_options_str  += '<option value="Montjoie-en-Couserans">Montjoie-en-Couserans</option>';
+            NOM_options_str  += '<option value="Montoulieu">Montoulieu</option>';
+            NOM_options_str  += '<option value="Montseron">Montseron</option>';
+            NOM_options_str  += '<option value="Montségur">Montségur</option>';
+            NOM_options_str  += '<option value="Montégut-Plantaurel">Montégut-Plantaurel</option>';
+            NOM_options_str  += '<option value="Montégut-en-Couserans">Montégut-en-Couserans</option>';
+            NOM_options_str  += '<option value="Moulin-Neuf">Moulin-Neuf</option>';
+            NOM_options_str  += '<option value="Moulis">Moulis</option>';
+            NOM_options_str  += '<option value="Méras">Méras</option>';
+            NOM_options_str  += '<option value="Mérens-les-Vals">Mérens-les-Vals</option>';
+            NOM_options_str  += '<option value="Mérigon">Mérigon</option>';
+            NOM_options_str  += '<option value="Nalzen">Nalzen</option>';
+            NOM_options_str  += '<option value="Nescus">Nescus</option>';
+            NOM_options_str  += '<option value="Niaux">Niaux</option>';
+            NOM_options_str  += '<option value="Orgeix">Orgeix</option>';
+            NOM_options_str  += '<option value="Orgibet">Orgibet</option>';
+            NOM_options_str  += '<option value="Orlu">Orlu</option>';
+            NOM_options_str  += '<option value="Ornolac-Ussat-les-Bains">Ornolac-Ussat-les-Bains</option>';
+            NOM_options_str  += '<option value="Orus">Orus</option>';
+            NOM_options_str  += '<option value="Oust">Oust</option>';
+            NOM_options_str  += '<option value="Pailhès">Pailhès</option>';
+            NOM_options_str  += '<option value="Pamiers">Pamiers</option>';
+            NOM_options_str  += '<option value="Pech">Pech</option>';
+            NOM_options_str  += '<option value="Perles-et-Castelet">Perles-et-Castelet</option>';
+            NOM_options_str  += '<option value="Prades">Prades</option>';
+            NOM_options_str  += '<option value="Pradettes">Pradettes</option>';
+            NOM_options_str  += '<option value="Pradières">Pradières</option>';
+            NOM_options_str  += '<option value="Prat-Bonrepaux">Prat-Bonrepaux</option>';
+            NOM_options_str  += '<option value="Prayols">Prayols</option>';
+            NOM_options_str  += '<option value="Péreille">Péreille</option>';
+            NOM_options_str  += '<option value="Quié">Quié</option>';
+            NOM_options_str  += '<option value="Quérigut">Quérigut</option>';
+            NOM_options_str  += '<option value="Rabat-les-Trois-Seigneurs">Rabat-les-Trois-Seigneurs</option>';
+            NOM_options_str  += '<option value="Raissac">Raissac</option>';
+            NOM_options_str  += '<option value="Rieucros">Rieucros</option>';
+            NOM_options_str  += '<option value="Rieux-de-Pelleport">Rieux-de-Pelleport</option>';
+            NOM_options_str  += '<option value="Rimont">Rimont</option>';
+            NOM_options_str  += '<option value="Rivèrenert">Rivèrenert</option>';
+            NOM_options_str  += '<option value="Roquefixade">Roquefixade</option>';
+            NOM_options_str  += '<option value="Roquefort-les-Cascades">Roquefort-les-Cascades</option>';
+            NOM_options_str  += '<option value="Roumengoux">Roumengoux</option>';
+            NOM_options_str  += '<option value="Rouze">Rouze</option>';
+            NOM_options_str  += '<option value="Régat">Régat</option>';
+            NOM_options_str  += '<option value="Sabarat">Sabarat</option>';
+            NOM_options_str  += '<option value="Saint-Amadou">Saint-Amadou</option>';
+            NOM_options_str  += '<option value="Saint-Amans">Saint-Amans</option>';
+            NOM_options_str  += '<option value="Saint-Bauzeil">Saint-Bauzeil</option>';
+            NOM_options_str  += '<option value="Saint-Félix-de-Rieutord">Saint-Félix-de-Rieutord</option>';
+            NOM_options_str  += '<option value="Saint-Félix-de-Tournegat">Saint-Félix-de-Tournegat</option>';
+            NOM_options_str  += '<option value="Saint-Girons">Saint-Girons</option>';
+            NOM_options_str  += '<option value="Saint-Jean-d&apos;Aigues-Vives">Saint-Jean-d&apos;Aigues-Vives</option>';
+            NOM_options_str  += '<option value="Saint-Jean-de-Verges">Saint-Jean-de-Verges</option>';
+            NOM_options_str  += '<option value="Saint-Jean-du-Castillonnais">Saint-Jean-du-Castillonnais</option>';
+            NOM_options_str  += '<option value="Saint-Jean-du-Falga">Saint-Jean-du-Falga</option>';
+            NOM_options_str  += '<option value="Saint-Julien-de-Gras-Capou">Saint-Julien-de-Gras-Capou</option>';
+            NOM_options_str  += '<option value="Saint-Lary">Saint-Lary</option>';
+            NOM_options_str  += '<option value="Saint-Lizier">Saint-Lizier</option>';
+            NOM_options_str  += '<option value="Saint-Martin-d&apos;Oydes">Saint-Martin-d&apos;Oydes</option>';
+            NOM_options_str  += '<option value="Saint-Martin-de-Caralp">Saint-Martin-de-Caralp</option>';
+            NOM_options_str  += '<option value="Saint-Michel">Saint-Michel</option>';
+            NOM_options_str  += '<option value="Saint-Paul-de-Jarrat">Saint-Paul-de-Jarrat</option>';
+            NOM_options_str  += '<option value="Saint-Pierre-de-Rivière">Saint-Pierre-de-Rivière</option>';
+            NOM_options_str  += '<option value="Saint-Quentin-la-Tour">Saint-Quentin-la-Tour</option>';
+            NOM_options_str  += '<option value="Saint-Quirc">Saint-Quirc</option>';
+            NOM_options_str  += '<option value="Saint-Victor-Rouzaud">Saint-Victor-Rouzaud</option>';
+            NOM_options_str  += '<option value="Saint-Ybars">Saint-Ybars</option>';
+            NOM_options_str  += '<option value="Sainte-Croix-Volvestre">Sainte-Croix-Volvestre</option>';
+            NOM_options_str  += '<option value="Sainte-Foi">Sainte-Foi</option>';
+            NOM_options_str  += '<option value="Sainte-Suzanne">Sainte-Suzanne</option>';
+            NOM_options_str  += '<option value="Salsein">Salsein</option>';
+            NOM_options_str  += '<option value="Saurat">Saurat</option>';
+            NOM_options_str  += '<option value="Sautel">Sautel</option>';
+            NOM_options_str  += '<option value="Saverdun">Saverdun</option>';
+            NOM_options_str  += '<option value="Savignac-les-Ormeaux">Savignac-les-Ormeaux</option>';
+            NOM_options_str  += '<option value="Seix">Seix</option>';
+            NOM_options_str  += '<option value="Senconac">Senconac</option>';
+            NOM_options_str  += '<option value="Sentein">Sentein</option>';
+            NOM_options_str  += '<option value="Sentenac-d&apos;Oust">Sentenac-d&apos;Oust</option>';
+            NOM_options_str  += '<option value="Sentenac-de-Sérou">Sentenac-de-Sérou</option>';
+            NOM_options_str  += '<option value="Serres-sur-Arget">Serres-sur-Arget</option>';
+            NOM_options_str  += '<option value="Sieuras">Sieuras</option>';
+            NOM_options_str  += '<option value="Siguer">Siguer</option>';
+            NOM_options_str  += '<option value="Sor">Sor</option>';
+            NOM_options_str  += '<option value="Sorgeat">Sorgeat</option>';
+            NOM_options_str  += '<option value="Soueix-Rogalle">Soueix-Rogalle</option>';
+            NOM_options_str  += '<option value="Soula">Soula</option>';
+            NOM_options_str  += '<option value="Soulan">Soulan</option>';
+            NOM_options_str  += '<option value="Surba">Surba</option>';
+            NOM_options_str  += '<option value="Suzan">Suzan</option>';
+            NOM_options_str  += '<option value="Ségura">Ségura</option>';
+            NOM_options_str  += '<option value="Tabre">Tabre</option>';
+            NOM_options_str  += '<option value="Tarascon-sur-Ariège">Tarascon-sur-Ariège</option>';
+            NOM_options_str  += '<option value="Taurignan-Castet">Taurignan-Castet</option>';
+            NOM_options_str  += '<option value="Taurignan-Vieux">Taurignan-Vieux</option>';
+            NOM_options_str  += '<option value="Teilhet">Teilhet</option>';
+            NOM_options_str  += '<option value="Thouars-sur-Arize">Thouars-sur-Arize</option>';
+            NOM_options_str  += '<option value="Tignac">Tignac</option>';
+            NOM_options_str  += '<option value="Tourtouse">Tourtouse</option>';
+            NOM_options_str  += '<option value="Tourtrol">Tourtrol</option>';
+            NOM_options_str  += '<option value="Troye-d&apos;Ariège">Troye-d&apos;Ariège</option>';
+            NOM_options_str  += '<option value="Trémoulet">Trémoulet</option>';
+            NOM_options_str  += '<option value="Unac">Unac</option>';
+            NOM_options_str  += '<option value="Unzent">Unzent</option>';
+            NOM_options_str  += '<option value="Urs">Urs</option>';
+            NOM_options_str  += '<option value="Ussat">Ussat</option>';
+            NOM_options_str  += '<option value="Ustou">Ustou</option>';
+            NOM_options_str  += '<option value="Val-de-Sos">Val-de-Sos</option>';
+            NOM_options_str  += '<option value="Vals">Vals</option>';
+            NOM_options_str  += '<option value="Varilhes">Varilhes</option>';
+            NOM_options_str  += '<option value="Vaychis">Vaychis</option>';
+            NOM_options_str  += '<option value="Ventenac">Ventenac</option>';
+            NOM_options_str  += '<option value="Verdun">Verdun</option>';
+            NOM_options_str  += '<option value="Vernajoul">Vernajoul</option>';
+            NOM_options_str  += '<option value="Vernaux">Vernaux</option>';
+            NOM_options_str  += '<option value="Verniolle">Verniolle</option>';
+            NOM_options_str  += '<option value="Villeneuve">Villeneuve</option>';
+            NOM_options_str  += '<option value="Villeneuve-d&apos;Olmes">Villeneuve-d&apos;Olmes</option>';
+            NOM_options_str  += '<option value="Villeneuve-du-Latou">Villeneuve-du-Latou</option>';
+            NOM_options_str  += '<option value="Villeneuve-du-Paréage">Villeneuve-du-Paréage</option>';
+            NOM_options_str  += '<option value="Vira">Vira</option>';
+            NOM_options_str  += '<option value="Viviès">Viviès</option>';
+            NOM_options_str  += '<option value="Vèbre">Vèbre</option>';
+            sel_NOM.innerHTML = NOM_options_str;
+            div_NOM.appendChild(sel_NOM);
+            var lab_NOM = document.createElement('div');
+            lab_NOM.innerHTML = 'NOM';
+            lab_NOM.className = 'filterlabel';
+            div_NOM.appendChild(lab_NOM);
+            var reset_NOM = document.createElement('div');
+            reset_NOM.innerHTML = 'clear filter';
+            reset_NOM.className = 'filterlabel';
+            reset_NOM.onclick = function() {
+                var options = document.getElementById("sel_NOM").options;
+                for (var i=0; i < options.length; i++) {
+                    options[i].selected = false;
+                }
+                filterFunc();
+            };
+            div_NOM.appendChild(reset_NOM);
+        resetLabels([layer_CommuneArige_2]);
+        map.on("zoomend", function(){
+            resetLabels([layer_CommuneArige_2]);
+        });
+        map.on("layeradd", function(){
+            resetLabels([layer_CommuneArige_2]);
+        });
+        map.on("layerremove", function(){
+            resetLabels([layer_CommuneArige_2]);
+        });
+        </script>
+    </body>
+</html>

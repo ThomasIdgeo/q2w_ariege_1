@@ -13,7 +13,7 @@ Démonstration à partir d'un projet existant.
 
 Principe de simple modification, commit, push.
 
-### Etpae 2
+### Etape 2
 
 Démonstration de la création d'une branche.
 

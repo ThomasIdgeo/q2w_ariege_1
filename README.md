@@ -25,4 +25,6 @@ On va confier la tâche à un administrateur qui vérifiera la compatibilité et
 
 Dans notre exemple, nous modifions la seconde branche pour la fusionner au final sans modifier la branche principale.
 
+### Etape 3
+
 
